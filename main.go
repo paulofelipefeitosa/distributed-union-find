@@ -2,18 +2,18 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"github.com/paulofelipefeitosa/distributed-union-find/config"
+	"log"
 )
 
 func main() {
-	conf, err := DefaultConfigurator{}.read("appconfig.json")
+	conf, err := config.DefaultConfigurator{}.Read("appconfig.json")
 	if err != nil {
 		log.Fatal(err)
 	}
-	if conf.isInitiator() {
-		fmt.Printf("is initiator")
+	if conf.IsInitiator() {
+		fmt.Printf("is initiator\n")
 	} else {
-		fmt.Printf("is not initiator")
+		fmt.Printf("is not initiator\n")
 	}
 }

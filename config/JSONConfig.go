@@ -9,18 +9,18 @@ const JsonExtension = ".json"
 
 type JSONConfigurator struct {
 	Initiator bool
-	Neighborhood []string
+	Neighbors []string
 }
 
-func (r JSONConfigurator) isInitiator() bool {
+func (r JSONConfigurator) IsInitiator() bool {
 	return r.Initiator
 }
 
-func (r JSONConfigurator) neighborhood() []string {
-	return r.Neighborhood
+func (r JSONConfigurator) Neighborhood() []string {
+	return r.Neighbors
 }
 
-func (r JSONConfigurator) read(confFilePath string) (AppConfig, error) {
+func (r JSONConfigurator) Read(confFilePath string) (AppConfig, error) {
 	file, err := os.Open(confFilePath)
 	defer file.Close()
 	if err != nil {
