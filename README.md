@@ -27,7 +27,9 @@ Consider a distributed system with a general graph structure where each node has
 
 # Solution
 
-**TODO**: A Distributed implementation of Disjoint Sets Union a.k.a Union-Find.
+A Distributed implementation of Disjoint Sets Union a.k.a Union-Find.
+
+**TODO**: more detailed description of the algorithm
 
 ## Install
 
@@ -37,7 +39,7 @@ go build
 
 ## Setting up
 
-Before running the App replica, is necessary to config some attribute in the ```appconfig.json``` file.
+Before running the App replica, is necessary to config some attributes in the ```appconfig.json``` file.
 ``` bash
 {
   "MyIP": "localhost",
