@@ -9,6 +9,7 @@ import (
 type AppConfig interface {
 	IsInitiator() bool
 	Neighborhood() []string
+	URL() URL
 }
 
 type Configurator interface {

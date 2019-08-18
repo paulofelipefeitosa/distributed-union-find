@@ -10,6 +10,9 @@ const JsonExtension = ".json"
 type JSONConfigurator struct {
 	Initiator bool
 	Neighbors []string
+	MyIP string
+	Protocol string
+	Port int
 }
 
 func (r JSONConfigurator) IsInitiator() bool {
@@ -18,6 +21,10 @@ func (r JSONConfigurator) IsInitiator() bool {
 
 func (r JSONConfigurator) Neighborhood() []string {
 	return r.Neighbors
+}
+
+func (r JSONConfigurator) URL() URL {
+	return URL{Protocol: r.Protocol, IP: r.MyIP, Port: r.Port}
 }
 
 func (r JSONConfigurator) Read(confFilePath string) (AppConfig, error) {
