@@ -27,7 +27,7 @@ Consider a distributed system with a general graph structure where each node has
 
 # Solution
 
-A Distributed implementation of Union of Disjoint Sets a.k.a Union-Find.
+A Distributed implementation of Disjoint Sets Union a.k.a Union-Find.
 
 ## Install
 
@@ -35,8 +35,22 @@ A Distributed implementation of Union of Disjoint Sets a.k.a Union-Find.
 go build
 ```
 
+## Setting up
+
+Before running the App replica, is necessary to config some attribute in the ```appconfig.json``` file.
+``` bash
+{
+  "MyIP": "localhost",
+  "Port": 9002,
+  "Protocol": "http",
+  "Initiator": true,
+  "Neighborhood": ["http://localhost:9000", "http://localhost:9001"]
+}
+```
+
 ## Run
 
+Let's play.
 ```bash
 ./distributed-union-find
 ```
