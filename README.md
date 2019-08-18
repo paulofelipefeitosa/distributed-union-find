@@ -27,7 +27,7 @@ Consider a distributed system with a general graph structure where each node has
 
 # Solution
 
-A Distributed implementation of Disjoint Sets Union a.k.a Union-Find.
+**TODO**: A Distributed implementation of Disjoint Sets Union a.k.a Union-Find.
 
 ## Install
 
