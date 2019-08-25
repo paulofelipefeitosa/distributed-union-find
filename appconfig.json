@@ -3,5 +3,5 @@
   "Port": 9002,
   "Protocol": "http",
   "Initiator": true,
-  "Neighborhood": ["http://localhost:9000", "http://localhost:9001"]
+  "Neighbors": ["http://localhost:9000", "http://localhost:9001"]
 }
