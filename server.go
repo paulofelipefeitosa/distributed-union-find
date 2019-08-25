@@ -9,29 +9,30 @@ import (
 	"net/http"
 )
 
-type Server interface {
+type Component interface {
 	Build(appConfig config.AppConfig)
 	GetURL() config.URL
 
 	GrabFuncHandler() http.HandlerFunc
-	GetIDFuncHandler() http.HandlerFunc
+	InfoFuncHandler() http.HandlerFunc
 }
 
 func Serve(conf config.AppConfig) {
-	var server Server
+	var component Component
 	if conf.IsInitiator() {
 		log.Print("Server is a Master App\n")
-		server = &master.ServerMaster{}
-		server.Build(conf)
+		component = &master.ServerMaster{}
+		component.Build(conf)
 	} else {
+		// TODO:
 		log.Print("Server is a Slave App\n")
 	}
 
 	router := mux.NewRouter()
-	router.HandleFunc("/grab/{MasterURL:.*}", server.GrabFuncHandler()).Methods(http.MethodGet)
-	router.HandleFunc("/ID", server.GetIDFuncHandler()).Methods(http.MethodGet)
+	router.HandleFunc("/grab", component.GrabFuncHandler()).Methods(http.MethodPost)
+	router.HandleFunc("/info", component.InfoFuncHandler()).Methods(http.MethodGet)
 
-	serverURL := server.GetURL()
+	serverURL := component.GetURL()
 	log.Printf("Server URL %+v\n", serverURL)
 
 	s := &http.Server{
