@@ -29,7 +29,12 @@ Consider a distributed system with a general graph structure where each node has
 
 A Distributed implementation of Disjoint Sets Union a.k.a Union-Find.
 
-**TODO**: more detailed description of the algorithm
+**TODO**: 
+   1. More detailed description of the algorithm
+   2. Grab component: master (Done), slave
+   3. Try to grab Neighbors: master (Doing), slave
+   4. Distribute IDs to slaves: master, slave
+   4. Unite Edge masters
 
 ## Install
 
