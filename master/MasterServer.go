@@ -30,7 +30,7 @@ func (server *ServerMaster) Build(appConfig config.AppConfig) {
 	neighbors := len(server.Neighbors)
 	gbStatsCh := make(chan protocol.GrabResponse, neighbors)
 	for _, element := range server.Neighbors {
-		go server.Grab(element, gbStatsCh)
+		go grab(server.URL, element, gbStatsCh)
 	}
 	go server.MergeGrabs(gbStatsCh, neighbors)
 }
@@ -45,9 +45,9 @@ func (server *ServerMaster) MergeGrabs(ch chan protocol.GrabResponse, neighbors 
 	}
 }
 
-func (server *ServerMaster) Grab(url string, ch chan protocol.GrabResponse) {
+func grab(initiatorURL config.URL, url string, ch chan protocol.GrabResponse) {
 	reqBody := new(bytes.Buffer)
-	json.NewEncoder(reqBody).Encode(protocol.GrabRequest{Initiator: server.URL})
+	json.NewEncoder(reqBody).Encode(protocol.GrabRequest{Initiator: initiatorURL})
 
 	for {
 		resp, err := http.Post(url, "application/json", reqBody)
