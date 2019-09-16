@@ -34,7 +34,7 @@ A Distributed implementation of Disjoint Sets Union a.k.a Union-Find.
    2. Grab component: master (Done), slave
    3. Try to grab Neighbors: master (Done), slave
    4. Distribute IDs to slaves: master, slave
-   4. Unite Edge masters
+   4. Unite Edge masters (Done)
 
 ## Install
 
