@@ -11,7 +11,6 @@ type JSONConfigurator struct {
 	Initiator bool
 	Neighbors []string
 	MyIP string
-	Protocol string
 	Port int
 }
 
@@ -24,7 +23,7 @@ func (r JSONConfigurator) Neighborhood() []string {
 }
 
 func (r JSONConfigurator) URL() URL {
-	return URL{Protocol: r.Protocol, IP: r.MyIP, Port: r.Port}
+	return URL{IP: r.MyIP, Port: r.Port}
 }
 
 func (r JSONConfigurator) Read(confFilePath string) (AppConfig, error) {

@@ -32,7 +32,7 @@ A Distributed implementation of Disjoint Sets Union a.k.a Union-Find.
 **TODO**: 
    1. More detailed description of the algorithm
    2. Grab component: master (Done), slave
-   3. Try to grab Neighbors: master (Doing), slave
+   3. Try to grab Neighbors: master (Done), slave
    4. Distribute IDs to slaves: master, slave
    4. Unite Edge masters
 
@@ -49,7 +49,6 @@ Before running the App replica, is necessary to config some attributes in the ``
 {
   "MyIP": "localhost",
   "Port": 9002,
-  "Protocol": "http",
   "Initiator": true,
   "Neighborhood": ["http://localhost:9000", "http://localhost:9001"]
 }

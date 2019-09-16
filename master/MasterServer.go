@@ -1,20 +1,20 @@
 package master
 
 import (
-	"io/ioutil"
-	"log"
 	"bytes"
-	"net/http"
 	"encoding/json"
-	"github.com/paulofelipefeitosa/distributed-union-find/utils"
 	"github.com/paulofelipefeitosa/distributed-union-find/config"
 	"github.com/paulofelipefeitosa/distributed-union-find/protocol"
+	"github.com/paulofelipefeitosa/distributed-union-find/utils"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"time"
 )
 
 type ServerMaster struct {
 	ID int
 	Neighbors []string
-	GrabbedNeighborhood []int //index
 	DomainSize int
 	URL config.URL
 	EdgeMasters utils.ConcurrentSet
@@ -27,39 +27,60 @@ func (server *ServerMaster) Build(appConfig config.AppConfig) {
 	server.URL = appConfig.URL()
 	server.EdgeMasters = utils.ConcurrentSet{}
 
-	// TODO: Try to Grab
+	neighbors := len(server.Neighbors)
+	gbStatsCh := make(chan protocol.GrabResponse, neighbors)
+	for _, element := range server.Neighbors {
+		go grab(server.URL, element, gbStatsCh)
+	}
+	go server.MergeGrabs(gbStatsCh, neighbors)
 }
 
-func (server *ServerMaster) grab(url string) bool {
-	reqBody := new(bytes.Buffer)
-	json.NewEncoder(reqBody).Encode(protocol.GrabRequest{Initiator: server.URL})
-
-	resp, err := http.Post(url, "application/json", reqBody)
-	if err != nil {
-		log.Printf("Cannot send grab request to %s due to %+v\n", url, err)
-		return false
+func (server *ServerMaster) MergeGrabs(ch chan protocol.GrabResponse, neighbors int) {
+	for i := 0; i < neighbors;i++ {
+		grabStats := <- ch
+		server.DomainSize += grabStats.Grabs
+		for _, element := range grabStats.EdgeInitiators {
+			server.EdgeMasters.Insert(element)
+		}
 	}
+}
 
-	defer resp.Body.Close()
-	if resp.StatusCode == http.StatusOK {
-		decoder := json.NewDecoder(resp.Body)
-		grabStats := protocol.GrabResponse{}
-		err = decoder.Decode(&grabStats)
+func grab(initiatorURL config.URL, url string, ch chan protocol.GrabResponse) {
+	reqBody := new(bytes.Buffer)
+	json.NewEncoder(reqBody).Encode(protocol.GrabRequest{Initiator: initiatorURL})
+
+	for {
+		resp, err := http.Post(url, "application/json", reqBody)
 		if err != nil {
-			log.Printf("Cannot decode response from grab request to %s due to %+v\n", url, err)
-			return false
+			log.Printf("Cannot send Grab request to %s due to %+v\n", url, err)
+			resp.Body.Close()
+			break
 		}
 
-		//TODO: response ok, if grabs > 0 then mark index as containing and increment domain size. Anyway merge Edge masters.
-	} else {
-		log.Printf("Send grab request to %s received %d status code\n", url, resp.StatusCode)
-		respBody, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Printf("Cannot read response from grab request to %s due to %+v\n", url, err)
+		if resp.StatusCode == http.StatusOK {
+			decoder := json.NewDecoder(resp.Body)
+			grabStats := protocol.GrabResponse{}
+			err = decoder.Decode(&grabStats)
+			resp.Body.Close()
+			if err != nil {
+				log.Printf("Cannot decode response from Grab request to %s due to %+v\n", url, err)
+				break
+			}
+
+			ch <- grabStats
+			break
 		} else {
-			log.Printf("Send grab request to %s received as response body: %s\n", url, respBody)
+			log.Printf("Send Grab request to %s received %d status code\n", url, resp.StatusCode)
+			respBody, err := ioutil.ReadAll(resp.Body)
+			resp.Body.Close()
+			if err != nil {
+				log.Printf("Cannot read response from Grab request to %s due to %+v\n", url, err)
+			} else {
+				log.Printf("Send Grab request to %s received as response body: %s\n", url, respBody)
+			}
 		}
-		return false
+		log.Printf("Sleeping 5 secs to retry %s Grabbing", url)
+		time.Sleep(time.Second * 5)
 	}
 }
 
@@ -92,7 +113,7 @@ func (server *ServerMaster) GrabFuncHandler() http.HandlerFunc {
 			return
 		}
 		log.Printf("Adding %+v to Edge Masters and returning %+v public address\n", grabberServer, server.URL)
-		server.EdgeMasters.Insert(grabberServer)
+		server.EdgeMasters.Insert(grabberServer.Initiator)
 
 		w.WriteHeader(http.StatusOK)
 		body := toBytes(protocol.GrabResponse{Grabs: 0, EdgeInitiators: []config.URL{server.URL}})
